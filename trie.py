@@ -1,0 +1,126 @@
+from typing import Dict
+
+class TrieNode:
+
+    def __init__(self, word = ''):
+        '''
+        Initializes a TrieNode with the given word and an initially
+        empty dictionary mapping strings to TrieNodes.
+        '''
+        self.word = word
+        self.is_word = False
+        self.children = dict()
+
+
+    def __str__(self):
+        return '{} -> {}'.format(self.word, self.children)
+
+
+
+class PrefixTree:
+    def __init__(self):
+        self.root = TrieNode()
+
+
+    def display(self):
+        '''
+        Prints the contents of this prefix tree.
+        '''
+        print('======================================================')
+        self.__displayHelper(self.root)
+        print('======================================================\n')
+
+
+    def __displayHelper(self, current):
+        '''
+        Private helper for printing the contents of this prefix tree.
+        '''
+        print(current)
+        for letter in current.children:
+            self.__displayHelper(current.children[letter])
+
+
+    def insert(self, word):
+        '''
+        Inserts the given word into this prefix tree.
+        '''
+        current = self.root
+        for i, char in enumerate(word):
+            if char not in current.children:
+                word_so_far = word[0:i+1]
+                current.children[char] = TrieNode(word_so_far)
+            current = current.children[char]
+        current.is_word = True
+
+
+    def find(self, word):
+        '''
+        Returns the TrieNode representing the given word if it exists
+        and None otherwise.
+        '''
+        current = self.root
+        for char in word:
+            if char not in current.children:
+                return None
+            current = current.children[char]
+
+        if current.is_word: return current
+
+
+    def __child_words_for(self, node, words):
+        '''
+        Private helper function. Cycles through all children
+        of node recursively, adding them to words if they
+        constitute whole words (as opposed to merely prefixes).
+        See starts_with for usage.
+        '''
+        if node.is_word:
+            words.append(node.word)
+        for letter in node.children:
+            self.__child_words_for(node.children[letter], words)
+
+
+    def starts_with(self, prefix):
+        '''
+        Returns a list of all words beginning with the given prefix, or
+        an empty list if no words begin with that prefix.
+        '''
+        words = list()
+        current = self.root
+        for char in prefix:
+            if char not in current.children:
+                # Could also just do return words since it's empty
+                return list()
+            current = current.children[char]
+        
+        self.__child_words_for(current, words)
+        return words
+
+
+    def size(self, current = None):
+        '''
+        Returns the size of this prefix tree, defined
+        as the total number of nodes in the tree.
+        '''
+        # By default, get the size of the whole trie, but
+        # allow the user to get the size of any subtrees as well
+        if not current:
+            current = self.root
+        count = 1
+        for letter in current.children:
+            count += self.size(current.children[letter])
+        return count
+
+
+# Note: see trie_test.py for more formal unit testing
+if __name__ == '__main__':
+    trie = PrefixTree()
+    trie.insert('apple')
+    trie.insert('app')
+    trie.insert('aposematic')
+    trie.insert('appreciate')
+    trie.insert('book')
+    trie.insert('bad')
+    trie.insert('bear')
+    trie.insert('bat')
+    print(trie.starts_with('app'))
