@@ -2,18 +2,18 @@ from typing import Dict
 
 class TrieNode:
 
-    def __init__(self, word = ''):
+    def __init__(self, text = ''):
         '''
-        Initializes a TrieNode with the given word and an initially
+        Initializes a TrieNode with the given string and an initially
         empty dictionary mapping strings to TrieNodes.
         '''
-        self.word = word
-        self.is_word = False
+        self.text = text
         self.children = dict()
+        self.is_word = False
 
 
     def __str__(self):
-        return '{} -> {}'.format(self.word, self.children)
+        return '{} -> {}'.format(self.text, self.children)
 
 
 
@@ -75,7 +75,7 @@ class PrefixTree:
         See starts_with for usage.
         '''
         if node.is_word:
-            words.append(node.word)
+            words.append(node.text)
         for letter in node.children:
             self.__child_words_for(node.children[letter], words)
 
@@ -123,4 +123,4 @@ if __name__ == '__main__':
     trie.insert('bad')
     trie.insert('bear')
     trie.insert('bat')
-    print(trie.starts_with('app'))
+    print(trie.display())
